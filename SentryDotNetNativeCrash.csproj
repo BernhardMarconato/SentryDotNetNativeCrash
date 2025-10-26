@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+	<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+	<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<Platforms>x86;x64;ARM64</Platforms>
+	<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="sentry.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="sentry.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="sentry_wer_module.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="sentry_wer_module.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+	<Target Name="EnsureSentryNativeFilesExist" BeforeTargets="BeforeBuild">
+		<Error Condition="!Exists('$(MSBuildProjectDirectory)\sentry.dll') Or !Exists('$(MSBuildProjectDirectory)\sentry_wer_module.dll')"
+			   Text="Required Sentry Native binaries are missing. Add them to the project directory directory." />
+	</Target>
+
+</Project>
