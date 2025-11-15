@@ -17,17 +17,17 @@ How to build the test .NET app that can upload a minidump on fail-fast exception
 * Build the sentry-native fork with new WER backend:  
 `cmake -B build -DSENTRY_BACKEND=wer -DSENTRY_BUILD_RUNTIMESTATIC=ON -DCMAKE_BUILD_TYPE=Debug -DSENTRY_BUILD_SHARED_LIBS=ON`  
 `cmake --build build --config Debug`
-* Copy the compiled binaries `sentry.dll`, `sentry_wer_module.dll` (and pdb files if required) from the `sentry-native\build\Debug` directory to the `SentryDotNetNativeCrash` .NET project directory
+* Copy the compiled binaries `sentry.dll`, `sentry_wer_module.dll` (and pdb files if required) from the `sentry-native\build\Debug` directory to the `SentryDotNetNativeCrash\SentryDotNetCommon` .NET project directory
 * Launch the `SentryDotNetNativeCrash\SentryDotNetNativeCrash.slnx` solution in Visual Studio
-* Update the Sentry DSN in the Program.cs file
+* Update the Sentry DSN in the `SentryDotNetNativeCrash\SentryDotNetCommon\SentryNative.cs` file
 * Ensure `sentry.dll`, `sentry_wer_module.dll` binaries are set to "Copy to Output Directory: Copy if newer" in the Solution Explorer
 * Build the solution
-* Go to the output directory `SentryDotNetNativeCrash\bin\x64\Debug\net8.0-windows10.0.19041.0`
+* Go to the output directory `SentryDotNetNativeCrash\SentryDotNetNativeCrash\bin\x64\Debug\net8.0-windows10.0.19041.0`
 * Upload all symbols from this directory to Sentry using `sentry-cli.exe`
 * Optional: start *Sysinternals DebugView* app to see debug logs of WER handler (as it runs in the WerFault.exe process)
 * Start the `SentryDotNetNativeCrash.exe`
 * Press any key to cause the crash
-* Verify in the `SentryDotNetNativeCrash\bin\x64\Debug\net8.0-windows10.0.19041.0\sentry-cache\<GUID>` directory, a `.dmp` file was created
+* Verify in the `SentryDotNetNativeCrash\SentryDotNetNativeCrash\bin\x64\Debug\net8.0-windows10.0.19041.0\sentry-cache\<GUID>` directory, a `.dmp` file was created
 * Check on Sentry.io whether the minidump arrived
 * Optional: Open the `.dmp` file in `WinDbg` and enter `!analyze -v` to analyze the dump locally
 

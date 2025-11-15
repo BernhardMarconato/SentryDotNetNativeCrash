@@ -1,9 +1,34 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
-namespace SentryDotNetNativeCrash
+namespace SentryDotNetCommon
 {
-    internal partial class SentryNative
+    public partial class SentryNative
     {
+        public static bool InitializeForDotNet(string? release = null, string? environment = null, bool debug = false)
+        {
+            const string sentryDsn = "";
+            if (string.IsNullOrEmpty(sentryDsn))
+            {
+                Console.WriteLine("Please set the Sentry DSN in the source code before running.");
+                return false;
+            }
+
+            // .NET registers its custom exception module first and takes precedence
+            // https://github.com/dotnet/runtime/blob/82ce59a6f6d415a3df5edd94b7917ab7d13a7b0c/src/coreclr/vm/dwreport.cpp#L112
+            // Therefore unregister it so our handler is called
+            var runtimeDirectory = RuntimeEnvironment.GetRuntimeDirectory();
+            var dotNetExceptionModule = System.IO.Path.Combine(runtimeDirectory, "mscordaccore.dll");
+            var clrModuleBase = GetModuleHandleW("coreclr.dll");
+
+            var wasUnregistered = WerUnregisterRuntimeExceptionModule(dotNetExceptionModule, clrModuleBase);
+
+            var tmpDirectory = System.IO.Path.GetDirectoryName(Environment.ProcessPath!)!;
+            var cacheDirectory = System.IO.Path.Combine(tmpDirectory, "sentry-cache");
+
+            // Will internally register custom WER handler
+            return Initialize(sentryDsn, cacheDirectory, release, environment, debug);
+        }
+
         private const string SentryLibrary = "sentry.dll";
 
         // Opaque pointer types represented as IntPtr
